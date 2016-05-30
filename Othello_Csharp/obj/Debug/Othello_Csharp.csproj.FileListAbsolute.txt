@@ -1,0 +1,9 @@
+c:\users\hp\documents\visual studio 2013\Projects\Othello_Csharp\Othello_Csharp\bin\Debug\Othello_Csharp.exe.config
+c:\users\hp\documents\visual studio 2013\Projects\Othello_Csharp\Othello_Csharp\bin\Debug\Othello_Csharp.exe
+c:\users\hp\documents\visual studio 2013\Projects\Othello_Csharp\Othello_Csharp\bin\Debug\Othello_Csharp.pdb
+c:\users\hp\documents\visual studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.csprojResolveAssemblyReference.cache
+c:\users\hp\documents\visual studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.Main.resources
+c:\users\hp\documents\visual studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.Properties.Resources.resources
+c:\users\hp\documents\visual studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.csproj.GenerateResource.Cache
+c:\users\hp\documents\visual studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.exe
+c:\users\hp\documents\visual studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.pdb
