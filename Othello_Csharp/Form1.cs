@@ -14,12 +14,13 @@ namespace Othello_Csharp
     {
         int[,] board = new int[8, 8];
         Button[,] projection = new Button[8, 8];
-        int[][] pos_able = new int[20][];
+        int[][] pos_able = new int[30][];
         int pos_able_num = 0;
-        int[][][] pos_flip = new int[20][][];
-        int[] pos_flip_num = new int[20];
+        int[][][] pos_flip = new int[30][][];
+        int[] pos_flip_num = new int[30];
         int[] pos_click = new int[2];
         int Player = 1;
+        bool unable = false;
         public Main()
         {
             InitializeComponent();
@@ -92,7 +93,7 @@ namespace Othello_Csharp
             InitialBoard();
             RefrashBoard();
             int i;
-            for (i = 0; i < 20; i++)
+            for (i = 0; i < 30; i++)
             {
                 pos_flip[i] = new int[20][];
             }
@@ -251,8 +252,6 @@ namespace Othello_Csharp
             int flip_num = 0;
             for (i = 0; i < pos_border_num; i++)
             {
-                if (i == 6)
-                    i = 6;
                 pos = pos_border [i];
                 row = pos[0];
                 column = pos[1];
@@ -434,7 +433,7 @@ namespace Othello_Csharp
                 {
                     lean_negG2 = row + 1;
                 }
-                for (j = 1; j < lean_posG2; j++)
+                for (j = 1; j < lean_negG2; j++)
                 {
                     if (board[row - j, column + j] == PlayerY)
                     {
@@ -458,12 +457,33 @@ namespace Othello_Csharp
                 #endregion
             }
 
-            for (i = 0; i < pos_able_num; i++)
+            if (pos_able_num == 0)
             {
-                row = pos_able[i][0];
-                column = pos_able[i][1];
-                projection[row, column].Enabled = true;
-                projection[row, column].BackColor = SystemColors.ButtonFace;
+                if (unable)
+                {
+                    finish();
+                }
+                else
+                {
+                    unable = true;
+                    if (Player == 1)
+                        Player = 2;
+                    else
+                        Player = 1;
+                    Getpos(Player);
+                }
+
+            }
+            else
+            {
+                unable = false;
+                for (i = 0; i < pos_able_num; i++)
+                {
+                    row = pos_able[i][0];
+                    column = pos_able[i][1];
+                    projection[row, column].Enabled = true;
+                    projection[row, column].BackColor = SystemColors.ButtonFace;
+                }
             }
         }
 
@@ -494,7 +514,7 @@ namespace Othello_Csharp
             int i, j, row, column;
             for (i = 0; i < pos_able_num; i++)
             {
-                if (pos_able[i][0] == pos_click[0] && pos_able[i][1] == pos_able[i][1])
+                if (pos_able[i][0] == pos_click[0] && pos_able[i][1] == pos_click[1])
                 {
                     for (j = 0; j<pos_flip_num[i]; j++)
                     {
@@ -505,13 +525,38 @@ namespace Othello_Csharp
                 }
             }
             RefrashBoard();
-            this.Refresh();
             if (Player == 1)
                 Player = 2;
             else
                 Player = 1;
             pos_able_num = 0;
             Getpos(Player);
+        }
+        public void finish()
+        {
+            int one = 0, two = 0, i, j;
+            for (i = 0; i < 8; i++)
+            {
+                for (j = 0; j < 8; j++)
+                {
+                    if (board[i, j] == 1)
+                        one++;
+                    else if (board[i, j] == 2)
+                        two++;
+                }
+            }
+            if (one > two)
+            {
+                MessageBox.Show("player one win");
+            }
+            else if (one < two)
+            {
+                MessageBox.Show("player two win");
+            }
+            else
+            {
+                MessageBox.Show("0");
+            }
         }
     }
 }
