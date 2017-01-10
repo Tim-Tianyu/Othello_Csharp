@@ -525,6 +525,7 @@ namespace Othello_Csharp
                 }
             }
             RefrashBoard();
+            count();
             if (Player == 1)
                 Player = 2;
             else
@@ -534,17 +535,12 @@ namespace Othello_Csharp
         }
         public void finish()
         {
-            int one = 0, two = 0, i, j;
-            for (i = 0; i < 8; i++)
-            {
-                for (j = 0; j < 8; j++)
-                {
-                    if (board[i, j] == 1)
-                        one++;
-                    else if (board[i, j] == 2)
-                        two++;
-                }
-            }
+            int one, two;
+            int[] temp = new int[2];
+            temp = count();
+            one = temp[0];
+            two = temp[1];
+            
             if (one > two)
             {
                 MessageBox.Show("player one win");
@@ -557,6 +553,24 @@ namespace Othello_Csharp
             {
                 MessageBox.Show("0");
             }
+        }
+        public int[] count()
+        {
+            int one = 0, two = 0, i, j;
+            for (i = 0; i < 8; i++)
+            {
+                for (j = 0; j < 8; j++)
+                {
+                    if (board[i, j] == 1)
+                        one++;
+                    else if (board[i, j] == 2)
+                        two++;
+                }
+            }
+            num1.Text = string.Format("{0:D}", one);
+            num2.Text = string.Format("{0:D}", two);
+
+            return new int[]{one, two};
         }
     }
 }
