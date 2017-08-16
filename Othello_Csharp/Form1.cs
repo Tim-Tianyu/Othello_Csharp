@@ -12,19 +12,22 @@ namespace Othello_Csharp
 {
     public partial class Main : Form
     {
-        int[,] board = new int[8, 8];
-        Button[,] projection = new Button[8, 8];
-        int[][] pos_able = new int[30][];
+        int[,] board = new int[8, 8];//棋盘  (0，1，2) 代表 (空，player1,player2)
+        Button[,] projection = new Button[8, 8];//对应的界面上的按钮（棋盘）
+        int[][] pos_able = new int[30][];//可以行棋的位置
         int pos_able_num = 0;
-        int[][][] pos_flip = new int[30][][];
+        int[][][] pos_flip = new int[30][][];//每个行棋位置的每个方向上所能翻的敌方棋子位置
         int[] pos_flip_num = new int[30];
-        int[] pos_click = new int[2];
-        int Player = 1;
-        bool unable = false;
+        int[] pos_click = new int[2];//被点击的位置
+        int[][] pos_border_blank = new int[32][];//紧靠棋子的空白位置（边界）
+        int pos_border_blank_num = 0;
+        int Player = 1;//标注行棋选手，1或2
+        int AI = 0; //0:不启用，1:AI先行 2:AI后行
+        bool unable = false;//标注对方上回合是否无法行棋
         public Main()
         {
             InitializeComponent();
-            #region InitializeProjection
+            #region InitializeProjection //将按钮对象放入矩阵中
             projection[0, 0] = Pos11;
             projection[0, 1] = Pos12;
             projection[0, 2] = Pos13;
@@ -93,13 +96,13 @@ namespace Othello_Csharp
             InitialBoard();
             RefrashBoard();
             int i;
-            for (i = 0; i < 30; i++)
+            for (i = 0; i < 30; i++)//初始化pos_flip
             {
                 pos_flip[i] = new int[20][];
             }
-            Getpos(Player);
+            Getpos(Player);//开始
         }
-        public void disableBoard()//将所有无法行棋的位置设为无法点击
+        public void disableBoard()//将所有可以行棋的位置设为无法点击，并改变颜色，用户点击后使用
         {
             int i;
             for (i = 0; i < pos_able_num; i++)
@@ -108,7 +111,7 @@ namespace Othello_Csharp
                 projection[pos_able[i][0], pos_able[i][1]].BackColor = SystemColors.ButtonShadow;
             }
         }
-        public void InitialBoard()//设置初始的四个棋子位置
+        public void InitialBoard()//设置初始的四个棋子位置，以及初始的空白边界12个
         {
             int i, j;
             for(i = 0; i < 8; i++)
@@ -118,8 +121,21 @@ namespace Othello_Csharp
             }
             board[3, 4] = board[4, 3] = 1;
             board[4, 4] = board[3, 3] = 2;
+            pos_border_blank_num = 12;
+            pos_border_blank[0] = new int[] { 2, 2 };
+            pos_border_blank[1] = new int[] { 2, 3 };
+            pos_border_blank[2] = new int[] { 2, 5 };
+            pos_border_blank[3] = new int[] { 2, 4 };
+            pos_border_blank[4] = new int[] { 3, 2 };
+            pos_border_blank[5] = new int[] { 3, 5 };
+            pos_border_blank[6] = new int[] { 4, 2 };
+            pos_border_blank[7] = new int[] { 4, 5 };
+            pos_border_blank[8] = new int[] { 5, 2 };
+            pos_border_blank[9] = new int[] { 5, 3 };
+            pos_border_blank[10] = new int[] { 5, 4 };
+            pos_border_blank[11] = new int[] { 5, 5 };
         }
-        public void RefrashBoard()//重绘棋盘
+        public void RefrashBoard()//重绘棋子位置
         {
             int i, j;
             for (i = 0; i < 8; i++)
@@ -133,11 +149,9 @@ namespace Othello_Csharp
                 }
             }
         }
-        public void Getpos(int PlayerX)
+        public void Getpos(int PlayerX)//获得可行棋的位置
         {
             int PlayerY;
-            int[][] pos_blank = new int[60][];
-            int pos_blank_num = 0;
             int[][] pos_border = new int[32][];
             int pos_border_num = 0;
             int lean_posG1, lean_posG2, lean_negG1, lean_negG2;
@@ -148,29 +162,16 @@ namespace Othello_Csharp
                 PlayerY = 1;
 
             int i, j;
-            for (i = 0; i < 8; i++)
-            {
-                for (j = 0; j < 8; j++)
-                {
-                    if (board[i, j] == 0)
-                    {
-                        pos_blank[pos_blank_num] = new int[] { i, j };//获得棋盘上所有空位的位置
-                        pos_blank_num++;
-                    }
-                }
-            }
-            Console.WriteLine(pos_blank_num);
-
             int[] pos = new int [2];
             int row;
             int column;
-            for (i = 0; i < pos_blank_num; i++)//获得所有靠近空位的敌方棋子
+            for (i = 0; i < pos_border_blank_num; i++)//获得所有靠近空位的敌方棋子
             {
-                pos = pos_blank [i];
+                pos = pos_border_blank [i];
                 row = pos[0];
                 column = pos[1];
                 //依次判断该空格的八个方向，每个方向都要先判断一下位置避免indexOutOfBound
-                //同一个敌方棋子可能会被多次加入到pos_border里面，数量应该相当于该棋子周围的空位数，此处可优化
+                //如果该空格旁边有敌方棋子则将该空格位置放入pos_border作为可行棋位置（pos_able）的候选
                 #region if
                 if (row < 7)
                 {
@@ -255,36 +256,35 @@ namespace Othello_Csharp
             Console.Read();
 
             int flip_num = 0;
+            //从空格开始依次向8个方向延伸，判段该空格是否可行棋，并将每个方向上能翻的敌方棋子记录在pos_filp内
             for (i = 0; i < pos_border_num; i++)
             {
                 pos = pos_border [i];
                 row = pos[0];
                 column = pos[1];
-                //逻辑有问题，在没确定能不能翻的情况下将位置放入pos_filp,造成资源的浪费
-                //但是并不会造成错误，因为pos_able_num并没有增长所以后来确实能翻的位置会把前面不能翻的位置覆盖掉，但是可能会留尾巴
                 #region for
-                for (j = 1; j < 8 - row; j++)
+                for (j = 1; j < 8 - row; j++)//向上延伸
                 {
-                    if (board[row + j, column] == PlayerY)
+                    if (board[row + j, column] == PlayerY)//遇到敌方棋子，将敌方棋子位置记录并继续在该方向延伸
                     {
                         pos_flip[pos_able_num][flip_num] = new int[] { row + j, column };
                         flip_num++;
                         continue;
                     }
-                    else if (board[row + j, column] == 0)
+                    else if (board[row + j, column] == 0)//遇到空格，该方向无效
                         break;
-                    else if (j != 1)//同时非空也非playerY
+                    else if (j != 1)//是我方棋子并且不是紧靠的棋子代表该空格可以行棋，
                     {
                         pos_able[pos_able_num] = new int[] { row, column };
                         pos_flip_num[pos_able_num] = flip_num;
                         pos_able_num++;
                         break;
                     }
-                    else
+                    else//紧靠的棋子是我方棋子，该方向无效
                         break;
                 }
-                flip_num = 0;
-                for (j = 1; j < row + 1; j++)
+                flip_num = 0;//重置，开始下一个方向上的延伸
+                for (j = 1; j < row + 1; j++)//向下延伸
                 {
                     if (board[row - j, column] == PlayerY)
                     {
@@ -305,7 +305,7 @@ namespace Othello_Csharp
                         break;
                 }
                 flip_num = 0;
-                for (j = 1; j < 8 - column; j++)
+                for (j = 1; j < 8 - column; j++)//向右延伸
                 {
                     if (board[row, column + j] == PlayerY)
                     {
@@ -326,7 +326,7 @@ namespace Othello_Csharp
                         break;
                 }
                 flip_num = 0;
-                for (j = 1; j < column + 1; j++)
+                for (j = 1; j < column + 1; j++)//向左延伸
                 {
                     if (board[row, column - j] == PlayerY)
                     {
@@ -348,17 +348,18 @@ namespace Othello_Csharp
                 }
                 flip_num = 0;
 
-                if (row < column)
+                //斜率为-1的方向上的延伸
+                if (row < column)//空格更靠左上，先碰到左边界和上边界
                 {
                     lean_posG1 = row;
                     lean_posG2 = column;
                 }
-                else
+                else//空格更靠右下，先碰到右边界和下边界
                 {
                     lean_posG1 = column;
                     lean_posG2 = row;
                 }
-                for (j = 1; j < lean_posG1 + 1; j++)
+                for (j = 1; j < lean_posG1 + 1; j++)//向右上延伸
                 {
                     if (board[row - j, column - j] == PlayerY)
                     {
@@ -379,7 +380,7 @@ namespace Othello_Csharp
                         break;
                 }
                 flip_num = 0;
-                for (j = 1; j < 8 - lean_posG2; j++)
+                for (j = 1; j < 8 - lean_posG2; j++)//向左下
                 {
                     if (board[row + j, column + j] == PlayerY)
                     {
@@ -410,7 +411,7 @@ namespace Othello_Csharp
                     lean_negG1 = column+1;
                 }
 
-                for (j = 1; j < lean_negG1; j++)
+                for (j = 1; j < lean_negG1; j++)//右下
                 {
                     if (board[row + j, column - j] == PlayerY)
                     {
@@ -440,7 +441,7 @@ namespace Othello_Csharp
                 {
                     lean_negG2 = row + 1;
                 }
-                for (j = 1; j < lean_negG2; j++)
+                for (j = 1; j < lean_negG2; j++)//左上
                 {
                     if (board[row - j, column + j] == PlayerY)
                     {
@@ -464,15 +465,15 @@ namespace Othello_Csharp
                 #endregion
             }
 
-            if (pos_able_num == 0)//无法行动
+            if (pos_able_num == 0)//我方无法行动
             {
-                if (unable)//双方都无法行动
+                if (unable)//双方都无法行动（敌方上回合无法行动，我方这回合无法行动，陷入江局）
                 {
                     finish();//结束游戏
                 }
-                else//一方无法行动
+                else//只是我方无法行动
                 {
-                    unable = true;
+                    unable = true;//记录该回合的无法行动
                     if (Player == 1)
                         Player = 2;
                     else
@@ -483,7 +484,7 @@ namespace Othello_Csharp
             }
             else//可以行动
             {
-                unable = false;
+                unable = false;//记录该回合可以行动
                 for (i = 0; i < pos_able_num; i++)
                 {
                     row = pos_able[i][0];
@@ -496,11 +497,11 @@ namespace Othello_Csharp
 
         
 
-        private void Button_Click(object sender, EventArgs e)
+        private void Button_Click(object sender, EventArgs e)//棋盘被点击
         {
             disableBoard();
             int i, j;
-            Button clicked = (Button)sender;
+            Button clicked = (Button)sender;//被点击的按钮
             for (i = 0;i < 8;i++)
             {
                 for (j = 0;j < 8; j++)
@@ -516,16 +517,17 @@ namespace Othello_Csharp
                 }
             }
             flip();
+            RefrashBoard();
             count();
             if (Player == 1)
                 Player = 2;
             else
                 Player = 1;
             pos_able_num = 0;
-            Getpos(Player);
-
+            updateborder();
+            Getpos(Player);//进入另一方的回合
         }
-        public void flip()
+        public void flip()//更新行棋后的棋盘
         {
             int i, j, row, column;
             for (i = 0; i < pos_able_num; i++)
@@ -540,9 +542,8 @@ namespace Othello_Csharp
                     }
                 }
             }
-            RefrashBoard();
         }
-        public void finish()
+        public void finish()//游戏结束
         {
             int one, two;
             int[] temp = new int[2];
@@ -563,7 +564,7 @@ namespace Othello_Csharp
                 MessageBox.Show("0");
             }
         }
-        public int[] count()
+        public int[] count()//数棋子
         {
             int one = 0, two = 0, i, j;
             for (i = 0; i < 8; i++)
@@ -580,6 +581,90 @@ namespace Othello_Csharp
             num2.Text = string.Format("{0:D}", two);
 
             return new int[]{one, two};
+        }
+
+        public int[][] updateborder()//行棋后更新边界
+        {
+            int[][] temp = new int[8][];
+            int temp_num = 0;
+
+            int[][] pos_new_border_blank = new int[32][];//新边界
+            int pos_new_border_blank_num = 0;
+
+            int row_click = pos_click[0], column_click = pos_click[1];
+            for (int i = 0; i < pos_border_blank_num; i++) //从边界中筛除掉新增的棋子位置
+            {
+                int row = pos_border_blank[i][0], column = pos_border_blank[i][1];
+                if (row != row_click || column != column_click)
+                {
+                    pos_new_border_blank[pos_new_border_blank_num] = new int[] { row, column };
+                    pos_new_border_blank_num++;
+                }
+            }
+            #region 新增棋子八个方向上判断是否为空格,空格位置暂存入temp
+            if (row_click<7 && column_click <7 && board[row_click + 1, column_click + 1] == 0)
+            {
+                temp[temp_num] = new int[] { row_click+1, column_click+1};
+                temp_num++;
+            }
+            if (row_click < 7 && column_click >0 && board[row_click + 1, column_click - 1] == 0)
+            {
+                temp[temp_num] = new int[] { row_click+1, column_click-1 };
+                temp_num++;
+            }
+            if (row_click < 7 && board[row_click + 1, column_click] == 0)
+            {
+                temp[temp_num] = new int[] { row_click+1, column_click };
+                temp_num++;
+            }
+            if (row_click >0 && column_click < 7 && board[row_click - 1, column_click + 1] == 0)
+            {
+                temp[temp_num] = new int[] { row_click-1, column_click+1 };
+                temp_num++;
+            }
+            if (row_click >0 && column_click >0 && board[row_click - 1, column_click - 1] == 0)
+            {
+                temp[temp_num] = new int[] { row_click-1, column_click-1 };
+                temp_num++;
+            }
+            if (row_click >0 && board[row_click - 1, column_click] == 0)
+            {
+                temp[temp_num] = new int[] { row_click-1, column_click };
+                temp_num++;
+            }
+            if (column_click <7 && board[row_click, column_click + 1] == 0)
+            {
+                temp[temp_num] = new int[] { row_click, column_click+1 };
+                temp_num++;
+            }
+            if (column_click >0 && board[row_click, column_click - 1] == 0)
+            {
+                temp[temp_num] = new int[] { row_click, column_click-1 };
+                temp_num++;
+            }
+            #endregion
+
+            for (int i = 0; i < temp_num; i++){
+                Boolean flag = true;//识别空格位置是否不存在于新边界里
+                int row = temp[i][0], column = temp[i][1];
+                for (int j = 0; j < pos_new_border_blank_num; j++)
+                {
+                    if (row == pos_new_border_blank[j][0] && column == pos_new_border_blank[j][1])
+                    {
+                        flag = false;//存在于新边界中
+                        break;
+                    }
+                }
+                if (flag)//不存在于新边界中
+                {
+                    pos_new_border_blank[pos_new_border_blank_num] = new int[] { row, column };
+                    pos_new_border_blank_num++;
+                }
+            }
+
+            pos_border_blank_num = pos_new_border_blank_num;
+            pos_border_blank = pos_new_border_blank;
+            return pos_new_border_blank;
         }
     }
 }
