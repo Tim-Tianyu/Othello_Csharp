@@ -99,7 +99,7 @@ namespace Othello_Csharp
             }
             Getpos(Player);
         }
-        public void disableBoard()
+        public void disableBoard()//将所有无法行棋的位置设为无法点击
         {
             int i;
             for (i = 0; i < pos_able_num; i++)
@@ -108,7 +108,7 @@ namespace Othello_Csharp
                 projection[pos_able[i][0], pos_able[i][1]].BackColor = SystemColors.ButtonShadow;
             }
         }
-        public void InitialBoard()
+        public void InitialBoard()//设置初始的四个棋子位置
         {
             int i, j;
             for(i = 0; i < 8; i++)
@@ -119,7 +119,7 @@ namespace Othello_Csharp
             board[3, 4] = board[4, 3] = 1;
             board[4, 4] = board[3, 3] = 2;
         }
-        public void RefrashBoard()
+        public void RefrashBoard()//重绘棋盘
         {
             int i, j;
             for (i = 0; i < 8; i++)
@@ -154,20 +154,23 @@ namespace Othello_Csharp
                 {
                     if (board[i, j] == 0)
                     {
-                        pos_blank[pos_blank_num] = new int[] { i, j };
+                        pos_blank[pos_blank_num] = new int[] { i, j };//获得棋盘上所有空位的位置
                         pos_blank_num++;
                     }
                 }
             }
+            Console.WriteLine(pos_blank_num);
 
             int[] pos = new int [2];
             int row;
             int column;
-            for (i = 0; i < pos_blank_num; i++)
+            for (i = 0; i < pos_blank_num; i++)//获得所有靠近空位的敌方棋子
             {
                 pos = pos_blank [i];
                 row = pos[0];
                 column = pos[1];
+                //依次判断该空格的八个方向，每个方向都要先判断一下位置避免indexOutOfBound
+                //同一个敌方棋子可能会被多次加入到pos_border里面，数量应该相当于该棋子周围的空位数，此处可优化
                 #region if
                 if (row < 7)
                 {
@@ -248,6 +251,8 @@ namespace Othello_Csharp
                 }
                 #endregion
             }
+            Console.WriteLine(pos_border_num);
+            Console.Read();
 
             int flip_num = 0;
             for (i = 0; i < pos_border_num; i++)
@@ -255,6 +260,8 @@ namespace Othello_Csharp
                 pos = pos_border [i];
                 row = pos[0];
                 column = pos[1];
+                //逻辑有问题，在没确定能不能翻的情况下将位置放入pos_filp,造成资源的浪费
+                //但是并不会造成错误，因为pos_able_num并没有增长所以后来确实能翻的位置会把前面不能翻的位置覆盖掉，但是可能会留尾巴
                 #region for
                 for (j = 1; j < 8 - row; j++)
                 {
@@ -266,7 +273,7 @@ namespace Othello_Csharp
                     }
                     else if (board[row + j, column] == 0)
                         break;
-                    else if (j != 1)
+                    else if (j != 1)//同时非空也非playerY
                     {
                         pos_able[pos_able_num] = new int[] { row, column };
                         pos_flip_num[pos_able_num] = flip_num;
@@ -457,35 +464,37 @@ namespace Othello_Csharp
                 #endregion
             }
 
-            if (pos_able_num == 0)
+            if (pos_able_num == 0)//无法行动
             {
-                if (unable)
+                if (unable)//双方都无法行动
                 {
-                    finish();
+                    finish();//结束游戏
                 }
-                else
+                else//一方无法行动
                 {
                     unable = true;
                     if (Player == 1)
                         Player = 2;
                     else
                         Player = 1;
-                    Getpos(Player);
+                    Getpos(Player);//直接进入另一方的回合
                 }
 
             }
-            else
+            else//可以行动
             {
                 unable = false;
                 for (i = 0; i < pos_able_num; i++)
                 {
                     row = pos_able[i][0];
                     column = pos_able[i][1];
-                    projection[row, column].Enabled = true;
+                    projection[row, column].Enabled = true;//在界面上标出可以行动的位置
                     projection[row, column].BackColor = SystemColors.ButtonFace;
                 }
             }
         }
+
+        
 
         private void Button_Click(object sender, EventArgs e)
         {
@@ -507,6 +516,13 @@ namespace Othello_Csharp
                 }
             }
             flip();
+            count();
+            if (Player == 1)
+                Player = 2;
+            else
+                Player = 1;
+            pos_able_num = 0;
+            Getpos(Player);
 
         }
         public void flip()
@@ -525,13 +541,6 @@ namespace Othello_Csharp
                 }
             }
             RefrashBoard();
-            count();
-            if (Player == 1)
-                Player = 2;
-            else
-                Player = 1;
-            pos_able_num = 0;
-            Getpos(Player);
         }
         public void finish()
         {
