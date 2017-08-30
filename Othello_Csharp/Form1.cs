@@ -263,7 +263,7 @@ namespace Othello_Csharp
                 row = pos[0];
                 column = pos[1];
                 #region for
-                for (j = 1; j < 8 - row; j++)//向上延伸
+                for (j = 1; j < 8 - row; j++)//向下延伸
                 {
                     if (board[row + j, column] == PlayerY)//遇到敌方棋子，将敌方棋子位置记录并继续在该方向延伸
                     {
@@ -284,7 +284,7 @@ namespace Othello_Csharp
                         break;
                 }
                 flip_num = 0;//重置，开始下一个方向上的延伸
-                for (j = 1; j < row + 1; j++)//向下延伸
+                for (j = 1; j < row + 1; j++)//向上延伸
                 {
                     if (board[row - j, column] == PlayerY)
                     {
@@ -349,17 +349,17 @@ namespace Othello_Csharp
                 flip_num = 0;
 
                 //斜率为-1的方向上的延伸
-                if (row < column)//空格更靠左上，先碰到左边界和上边界
+                if (row < column)//空格更靠右上，先碰到右边界和上边界
                 {
                     lean_posG1 = row;
                     lean_posG2 = column;
                 }
-                else//空格更靠右下，先碰到右边界和下边界
+                else//空格更靠左下，先碰到左边界和下边界
                 {
                     lean_posG1 = column;
                     lean_posG2 = row;
                 }
-                for (j = 1; j < lean_posG1 + 1; j++)//向右上延伸
+                for (j = 1; j < lean_posG1 + 1; j++)//向左上延伸
                 {
                     if (board[row - j, column - j] == PlayerY)
                     {
@@ -380,7 +380,7 @@ namespace Othello_Csharp
                         break;
                 }
                 flip_num = 0;
-                for (j = 1; j < 8 - lean_posG2; j++)//向左下
+                for (j = 1; j < 8 - lean_posG2; j++)//向右下
                 {
                     if (board[row + j, column + j] == PlayerY)
                     {
@@ -411,7 +411,7 @@ namespace Othello_Csharp
                     lean_negG1 = column+1;
                 }
 
-                for (j = 1; j < lean_negG1; j++)//右下
+                for (j = 1; j < lean_negG1; j++)//左下
                 {
                     if (board[row + j, column - j] == PlayerY)
                     {
@@ -441,7 +441,7 @@ namespace Othello_Csharp
                 {
                     lean_negG2 = row + 1;
                 }
-                for (j = 1; j < lean_negG2; j++)//左上
+                for (j = 1; j < lean_negG2; j++)//右上
                 {
                     if (board[row - j, column + j] == PlayerY)
                     {

@@ -25,3 +25,11 @@ C:\Users\ADMIN\Documents\Visual Studio 2013\Projects\Othello_Csharp\Othello_Csha
 C:\Users\ADMIN\Documents\Visual Studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.Main.resources
 C:\Users\ADMIN\Documents\Visual Studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.Properties.Resources.resources
 C:\Users\ADMIN\Documents\Visual Studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.csproj.GenerateResource.Cache
+C:\Users\lenovo\Documents\Visual Studio 2013\Projects\Othello_Csharp\Othello_Csharp\bin\Debug\Othello_Csharp.exe.config
+C:\Users\lenovo\Documents\Visual Studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.exe
+C:\Users\lenovo\Documents\Visual Studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.pdb
+C:\Users\lenovo\Documents\Visual Studio 2013\Projects\Othello_Csharp\Othello_Csharp\bin\Debug\Othello_Csharp.exe
+C:\Users\lenovo\Documents\Visual Studio 2013\Projects\Othello_Csharp\Othello_Csharp\bin\Debug\Othello_Csharp.pdb
+C:\Users\lenovo\Documents\Visual Studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.Main.resources
+C:\Users\lenovo\Documents\Visual Studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.Properties.Resources.resources
+C:\Users\lenovo\Documents\Visual Studio 2013\Projects\Othello_Csharp\Othello_Csharp\obj\Debug\Othello_Csharp.csproj.GenerateResource.Cache
