@@ -18,22 +18,19 @@ namespace Othello_Csharp
 
         private pieces[,] layout;
         private pieces player;
-        private Dictionary<int[], List<int[]>> posAble;
+        private Dictionary<Position, List<Position>> posAble;
         private Boolean calculated;
-
-        public Board():this(null, pieces.blank){
-            this.calculated = false;
-        }
 
         public Board(pieces[,] layout, pieces player)
         {
+            this.calculated = false;
             this.layout = new pieces[8, 8];
             if (layout != null && player != pieces.blank)
             {
                 this.player = player;
-                for (int i = 0; i < 8; i++)
+                for (byte i = 0; i < 8; i++)
                 {
-                    for (int j = 0; j < 8; j++)
+                    for (byte j = 0; j < 8; j++)
                     {
                         this.layout[i,j] = layout[i,j];
                     }
@@ -42,7 +39,7 @@ namespace Othello_Csharp
             else
             {
                 this.player = pieces.one;
-                int i, j;
+                byte i, j;
                 for (i = 0; i < 8; i++)
                 {
                     for (j = 0; j < 8; j++)
@@ -51,6 +48,19 @@ namespace Othello_Csharp
                 this.layout[3, 4] = this.layout[4, 3] = pieces.one;
                 this.layout[4, 4] = this.layout[3, 3] = pieces.one;
             }
+        }
+
+        public Board Copy(Board b)
+        {
+            Board new = Board(b.layout,b.player);
+            new.
+        }
+
+
+
+        public static Dictionary<Position, List<Position>>.KeyCollection getPosAble(Board b)
+        {
+            return b.posAble.Keys;
         }
 
         public Boolean isCalculated()
@@ -70,8 +80,8 @@ namespace Othello_Csharp
                 }else{
                     opponent = pieces.one;
                 }
-                Dictionary<int[], List<int[]>> posAble = new Dictionary<int[],List<int[]>>();
-                int row, column;
+                Dictionary<Position, List<Position>> posAble = new Dictionary<Position,List<Position>>();
+                byte row, column;
                 for (row = 0; row < 8; row++)
                 {
                     for (column = 0; column < 8; column++)
@@ -79,18 +89,18 @@ namespace Othello_Csharp
                         if (layout[row, column] == pieces.blank)
                         {
                             //从空格开始依次向8个方向延伸，判段该空格是否可行棋，并将每个方向上能翻的敌方棋子记录在posFilp内
-                            List<int[]> posFlip = new List<int[]>();
+                            List<Position> posFlip = new List<Position>();
                             #region  for
-                            int i;
+                            byte i;
                             Boolean flag = false;
-                            List<int[]> posCandidate = new List<int[]>();
+                            List<Position> posCandidate = new List<Position>();
                             pieces thisPos;
                             for (i = 1; i < 8 - row; i++)//向下延伸
                             {
                                 thisPos = layout[row + i, column];
                                 if (thisPos == opponent)//遇到敌方棋子，将敌方棋子位置记录并继续在该方向延伸
                                 {
-                                    posCandidate.Add(new int[]{ row + i, column });
+                                    posCandidate.Add(Position.position ( row + i, column ));
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;//遇到空格，该方向无效
@@ -99,14 +109,14 @@ namespace Othello_Csharp
                                     flag = true;//该方向成立
                                     break;
                                 }
-                                else break;//紧靠的棋子是我方棋子，该方向无效 
+                                else break;//紧靠的棋子是我方棋子，该方向无效
                             }
                             if (flag)//如果该方向成立
                             {
                                 posFlip.AddRange(posCandidate);//将暂时记录下来的可翻棋子永久记录下来
                                 flag = false;
                             }
-                            
+
                             //重置
                             posCandidate.Clear();
                             for (i = 1; i < row + 1; i++)//上
@@ -114,7 +124,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row - i, column];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(new int[] { row - i, column });
+                                    posCandidate.Add(Position.position ( row - i, column ));
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -137,7 +147,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row, column + i];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(new int[] { row, column + i});
+                                    posCandidate.Add(Position.position ( row, column + i));
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -160,7 +170,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row, column - i];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(new int[] { row, column - i });
+                                    posCandidate.Add(Position.position ( row, column - i ));
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -177,7 +187,7 @@ namespace Othello_Csharp
                                 flag = false;
                             }
 
-                            int boundLeftUp, boundLeftDown, boundRightUp, boundRightDown;
+                            byte boundLeftUp, boundLeftDown, boundRightUp, boundRightDown;
                             if (row < column)//空格更靠右上，先碰到右边界和上边界
                             {
                                 boundLeftUp = row + 1;
@@ -205,7 +215,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row - i, column - i];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(new int[] { row - i, column - i });
+                                    posCandidate.Add(Position.position ( row - i, column - i ));
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -228,7 +238,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row + i, column + i];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(new int[] { row + i, column + i });
+                                    posCandidate.Add(Position.position ( row + i, column + i ));
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -251,7 +261,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row + i, column - i];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(new int[] { row + i, column - i });
+                                    posCandidate.Add(Position.position ( row + i, column - i ));
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -274,7 +284,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row - i, column + i];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(new int[] { row - i, column + i });
+                                    posCandidate.Add(Position.position ( row - i, column + i ));
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -292,7 +302,7 @@ namespace Othello_Csharp
                             }
                             #endregion
                             if (posFlip.Count != 0)
-                                posAble.Add(new int[] { row, column }, posFlip);
+                                posAble.Add(Position.position ( row, column ), posFlip);
                         }
                     }
                 }
