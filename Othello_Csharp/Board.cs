@@ -18,6 +18,7 @@ namespace Othello_Csharp
 
         private pieces[,] layout;
         private pieces player;
+        private byte step = 0;
         private Dictionary<Position, List<Position>> posAble;
         private Boolean calculated;
 
@@ -50,17 +51,71 @@ namespace Othello_Csharp
             }
         }
 
-        public Board Copy(Board b)
+        public static Board Copy(Board b)
         {
             Board new = Board(b.layout,b.player);
-            new.
+            new.player = b.player
+            //get posAble done later
         }
-
-
 
         public static Dictionary<Position, List<Position>>.KeyCollection getPosAble(Board b)
         {
             return b.posAble.Keys;
+        }
+
+        public static List<Position> play (Position p, Board b)
+        {
+            try
+            {
+                List<Position> flipPos = b.posAble.Item[p];
+            }
+            catch (KeyNotFoundException e )
+            {
+                Console.WriteLine("wrong position");
+                throw;
+            }
+
+            b.step++;
+
+            foreach (Position p in flipPos)
+            {
+                layout[p.row,p.column] = b.player;
+            }
+
+            if (step == 64)
+            {
+                return;//game end
+            }
+
+            if (b.player == pieces.one)
+            {
+                b.player = pieces.two;
+            }
+            else
+            {
+                b.player = pieces.one;
+            }
+            b.calculated = false;
+            b.calculate();
+
+            if (b.posAble = 0) // skip one player
+            {
+                if (b.player == pieces.one)
+                {
+                    b.player = pieces.two;
+                }
+                else
+                {
+                    b.player = pieces.one;
+                }
+                b.calculated = false;
+                b.calculate();
+
+                if (b.posAble = 0)
+                {
+                    return; //game end (special)
+                }
+            }
         }
 
         public Boolean isCalculated()

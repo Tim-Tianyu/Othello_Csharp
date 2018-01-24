@@ -154,8 +154,7 @@ namespace Othello_Csharp
             else
                 Player = 1;
             pos_able_num = 0;
-            updateborder();
-            Getpos(Player);//进入另一方的回合
+            //进入另一方的回合
         }
         public void flip()//更新行棋后的棋盘
         {
