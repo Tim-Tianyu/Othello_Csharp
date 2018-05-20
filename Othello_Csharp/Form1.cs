@@ -12,18 +12,9 @@ namespace Othello_Csharp
 {
     public partial class Main : Form
     {
-        int[,] board = new int[8, 8];//棋盘  (0，1，2) 代表 (空，player1,player2)
-        Button[,] projection = new Button[8, 8];//对应的界面上的按钮（棋盘）
-        int[][] pos_able = new int[30][];//可以行棋的位置
-        int pos_able_num = 0;
-        int[][][] pos_flip = new int[30][][];//每个行棋位置的每个方向上所能翻的敌方棋子位置
-        int[] pos_flip_num = new int[30];
-        int[] pos_click = new int[2];//被点击的位置
-        int[][] pos_border_blank = new int[32][];//紧靠棋子的空白位置（边界）
-        int pos_border_blank_num = 0;
-        int Player = 1;//标注行棋选手，1或2
-        int AI = 0; //0:不启用，1:AI先行 2:AI后行
-        bool unable = false;//标注对方上回合是否无法行棋
+        Board board = new Board();
+        Button[,] projection = new Button[8, 8];//对应的界面上的按钮(棋盘)
+        Board.pieces player = Board.pieces.one;
         public Main()
         {
             InitializeComponent();
@@ -93,37 +84,43 @@ namespace Othello_Csharp
             projection[7, 6] = Pos87;
             projection[7, 7] = Pos88;
             #endregion
-            InitialBoard();
-            RefrashBoard();
-            int i;
-            for (i = 0; i < 30; i++)//初始化pos_flip
-            {
-                pos_flip[i] = new int[20][];
-            }
-            Getpos(Player);//开始
+            Position.initialPos();
+            initialBoard();
         }
+        public Color getColor(Board.pieces player){
+            if (player == Board.pieces.one)
+                return Color.LightPink;
+            else if (player == Board.pieces.two)
+                return Color.LightGreen;
+            else
+                return Color.White;
+        }
+
+        public void initialBoard()
+        {
+            Board.calculate(board);
+            projection[3, 4].BackColor = Color.LightPink;
+            projection[4, 3].BackColor = Color.LightPink;
+            projection[4, 4].BackColor = Color.LightGreen;
+            projection[3, 3].BackColor = Color.LightGreen;
+            enableBoard();
+        }
+
         public void disableBoard()//将所有可以行棋的位置设为无法点击，并改变颜色，用户点击后使用
         {
-            int i;
-            for (i = 0; i < pos_able_num; i++)
+            foreach (Position p in Board.getPosAble(board))
             {
-                projection[pos_able[i][0], pos_able[i][1]].Enabled = false;
-                projection[pos_able[i][0], pos_able[i][1]].BackColor = SystemColors.ButtonShadow;
+                projection[p.row, p.column].Enabled = false;
+                projection[p.row, p.column].BackColor = SystemColors.ButtonShadow;
             }
         }
 
-        public void RefrashBoard()//重绘棋子位置
+        public void enableBoard()
         {
-            int i, j;
-            for (i = 0; i < 8; i++)
+            foreach (Position p in Board.getPosAble(board))
             {
-                for (j = 0; j < 8; j++)
-                {
-                    if (board[i, j] == 1)
-                        projection[i, j].BackColor = Color.LightGreen;
-                    else if (board[i, j] == 2)
-                        projection[i, j].BackColor = Color.LightPink;
-                }
+                projection[p.row, p.column].Enabled = true;
+                projection[p.row, p.column].BackColor = SystemColors.ButtonFace;
             }
         }
 
@@ -132,53 +129,52 @@ namespace Othello_Csharp
             disableBoard();
             int i, j;
             Button clicked = (Button)sender;//被点击的按钮
+            clicked.BackColor = getColor(player);
+            List<Position> posFilp = new List<Position>();
             for (i = 0;i < 8;i++)
             {
                 for (j = 0;j < 8; j++)
                 {
                     if (projection[i,j] == clicked)
-                    {
-                        pos_click[0] = i;
-                        pos_click[1] = j;
-                        board[i, j] = Player;
+                    {   
+                        posFilp = Board.play(Position.board[i, j], board);
                         i = 7;
                         break;
                     }
                 }
             }
-            flip();
-            RefrashBoard();
-            count();
-            if (Player == 1)
-                Player = 2;
-            else
-                Player = 1;
-            pos_able_num = 0;
-            //进入另一方的回合
-        }
-        public void flip()//更新行棋后的棋盘
-        {
-            int i, j, row, column;
-            for (i = 0; i < pos_able_num; i++)
+            foreach (Position p in posFilp)
             {
-                if (pos_able[i][0] == pos_click[0] && pos_able[i][1] == pos_click[1])
-                {
-                    for (j = 0; j<pos_flip_num[i]; j++)
-                    {
-                        row = pos_flip[i][j][0];
-                        column = pos_flip[i][j][1];
-                        board[row, column] = Player;
-                    }
-                }
+                projection[p.row, p.column].BackColor = getColor(player);
+            }
+
+            Board.pieces  nextPlayer = Board.getCurrentPlayer(board);
+            if (player == nextPlayer)
+            {
+                MessageBox.Show("skip the turn");
+            }
+            player = nextPlayer;
+
+            if (player == Board.pieces.blank)
+            {
+                finish();
+            }
+            else
+            {
+                int[] score = Board.count(board);
+                num1.Text = string.Format("{0:D}", score[0]);
+                num2.Text = string.Format("{0:D}", score[1]);
+                enableBoard();
             }
         }
         public void finish()//游戏结束
         {
             int one, two;
-            int[] temp = new int[2];
-            temp = count();
+            int[] temp = Board.count(board);
             one = temp[0];
             two = temp[1];
+            num1.Text = string.Format("{0:D}", one);
+            num2.Text = string.Format("{0:D}", two);
 
             if (one > two)
             {
@@ -192,24 +188,6 @@ namespace Othello_Csharp
             {
                 MessageBox.Show("0");
             }
-        }
-        public int[] count()//数棋子
-        {
-            int one = 0, two = 0, i, j;
-            for (i = 0; i < 8; i++)
-            {
-                for (j = 0; j < 8; j++)
-                {
-                    if (board[i, j] == 1)
-                        one++;
-                    else if (board[i, j] == 2)
-                        two++;
-                }
-            }
-            num1.Text = string.Format("{0:D}", one);
-            num2.Text = string.Format("{0:D}", two);
-
-            return new int[]{one, two};
         }
     }
 }

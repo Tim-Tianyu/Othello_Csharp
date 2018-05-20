@@ -7,55 +7,47 @@ using System.Threading.Tasks;
 
 namespace Othello_Csharp
 {
-    class Board
+    public class Board
     {
-        static enum pieces
+        public enum pieces
         {
             blank = 0,
             one = 1,
             two = 2
         };
 
-        private pieces[,] layout;
+        private pieces[,] layout = new pieces[8,8];
         private pieces player;
         private byte step = 0;
-        private Dictionary<Position, List<Position>> posAble;
+        public Dictionary<Position, List<Position>> posAble;
         private Boolean calculated;
 
-        public Board(pieces[,] layout, pieces player)
+        public Board(pieces[,] layout, pieces player, byte step)
         {
             this.calculated = false;
             this.layout = new pieces[8, 8];
-            if (layout != null && player != pieces.blank)
+            this.step = step;
+            this.player = player;
+            for (byte i = 0; i < 8; i++)
             {
-                this.player = player;
-                for (byte i = 0; i < 8; i++)
+                for (byte j = 0; j < 8; j++)
                 {
-                    for (byte j = 0; j < 8; j++)
-                    {
-                        this.layout[i,j] = layout[i,j];
-                    }
+                    this.layout[i,j] = layout[i,j];
                 }
-            }
-            else
-            {
-                this.player = pieces.one;
-                byte i, j;
-                for (i = 0; i < 8; i++)
-                {
-                    for (j = 0; j < 8; j++)
-                        this.layout[i, j] = pieces.blank;
-                }
-                this.layout[3, 4] = this.layout[4, 3] = pieces.one;
-                this.layout[4, 4] = this.layout[3, 3] = pieces.one;
             }
         }
 
-        public static Board Copy(Board b)
+        public Board() 
         {
-            Board new = Board(b.layout,b.player);
-            new.player = b.player
-            //get posAble done later
+            this.player = pieces.one;
+            byte i, j;
+            for (i = 0; i < 8; i++)
+            {
+                for (j = 0; j < 8; j++)
+                    this.layout[i, j] = pieces.blank;
+            }
+            this.layout[3, 4] = this.layout[4, 3] = pieces.one;
+            this.layout[4, 4] = this.layout[3, 3] = pieces.two;
         }
 
         public static Dictionary<Position, List<Position>>.KeyCollection getPosAble(Board b)
@@ -63,29 +55,27 @@ namespace Othello_Csharp
             return b.posAble.Keys;
         }
 
+        // return the list of poistion need to flip when played at position p, change the board at the same time
         public static List<Position> play (Position p, Board b)
         {
+            List<Position> flipPos;
             try
             {
-                List<Position> flipPos = b.posAble.Item[p];
+                b.posAble.TryGetValue(p,out flipPos);
+                b.step++;
             }
             catch (KeyNotFoundException e )
             {
                 Console.WriteLine("wrong position");
-                throw;
+                throw e;
             }
+            b.layout[p.row, p.column] = b.player;
 
-            b.step++;
-
-            foreach (Position p in flipPos)
+            foreach (Position i in flipPos)
             {
-                layout[p.row,p.column] = b.player;
+                b.layout[i.row,i.column] = b.player;
             }
-
-            if (step == 64)
-            {
-                return;//game end
-            }
+            b.calculated = false;
 
             if (b.player == pieces.one)
             {
@@ -95,10 +85,49 @@ namespace Othello_Csharp
             {
                 b.player = pieces.one;
             }
-            b.calculated = false;
-            b.calculate();
+            return flipPos;
+        }
 
-            if (b.posAble = 0) // skip one player
+        // same as play method, but used for generate new board instead of changing itself (used in tree search)
+        public static Board next(Position p, Board b) 
+        {
+            List<Position> flipPos;
+            Board new_b = new Board(b.layout,b.player, b .step);
+            try
+            {
+                b.posAble.TryGetValue(p, out flipPos);
+                b.step++;
+            }
+            catch (KeyNotFoundException e)
+            {
+                Console.WriteLine("wrong position");
+                throw e;
+            }
+
+            foreach (Position i in flipPos)
+            {
+                new_b.layout[i.row, i.column] = b.player;
+            }
+
+            if (b.player == pieces.one)
+            {
+                new_b.player = pieces.two;
+            }
+            else
+            {
+                new_b.player = pieces.one;
+            }
+            return new_b;
+        }
+
+        public static pieces getCurrentPlayer(Board b) 
+        {
+            if (b.step == 64 || b.player == pieces.blank) return pieces.blank;
+            if (!b.calculated) 
+            {
+                calculate(b);
+            }
+            if (b.posAble.Count == 0) // skip one player
             {
                 if (b.player == pieces.one)
                 {
@@ -109,13 +138,32 @@ namespace Othello_Csharp
                     b.player = pieces.one;
                 }
                 b.calculated = false;
-                b.calculate();
+                calculate(b);
 
-                if (b.posAble = 0)
+                if (b.posAble.Count == 0)
                 {
-                    return; //game end (special)
+                    b.player = pieces.blank;
+                    return pieces.blank; //game end (special)
                 }
             }
+            return b.player;
+        }
+
+        public static int[] count(Board b) 
+        {
+            int p1 = 0, p2 = 0;
+            pieces[,] layout = b.layout;
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (layout[i, j] == pieces.one)
+                        p1++;
+                    else if (layout[i, j] == pieces.two)
+                        p2++;
+                }
+            }
+            return new int[] { p1, p2 };
         }
 
         public Boolean isCalculated()
@@ -123,6 +171,8 @@ namespace Othello_Csharp
             return calculated;
         }
 
+
+        // reset the posAble of the 
         public static Boolean calculate(Board b)//写成static应该更省内存
         {
             if (!b.calculated)
@@ -155,7 +205,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row + i, column];
                                 if (thisPos == opponent)//遇到敌方棋子，将敌方棋子位置记录并继续在该方向延伸
                                 {
-                                    posCandidate.Add(Position.position ( row + i, column ));
+                                    posCandidate.Add(Position.board[row + i, column]);
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;//遇到空格，该方向无效
@@ -179,7 +229,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row - i, column];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(Position.position ( row - i, column ));
+                                    posCandidate.Add(Position.board[row - i, column]);
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -202,7 +252,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row, column + i];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(Position.position ( row, column + i));
+                                    posCandidate.Add(Position.board[row, column + i]);
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -225,7 +275,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row, column - i];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(Position.position ( row, column - i ));
+                                    posCandidate.Add(Position.board[row, column - i]);
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -242,7 +292,7 @@ namespace Othello_Csharp
                                 flag = false;
                             }
 
-                            byte boundLeftUp, boundLeftDown, boundRightUp, boundRightDown;
+                            int boundLeftUp, boundLeftDown, boundRightUp, boundRightDown;
                             if (row < column)//空格更靠右上，先碰到右边界和上边界
                             {
                                 boundLeftUp = row + 1;
@@ -270,7 +320,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row - i, column - i];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(Position.position ( row - i, column - i ));
+                                    posCandidate.Add(Position.board[row - i, column - i]);
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -293,7 +343,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row + i, column + i];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(Position.position ( row + i, column + i ));
+                                    posCandidate.Add(Position.board[row + i, column + i]);
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -316,7 +366,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row + i, column - i];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(Position.position ( row + i, column - i ));
+                                    posCandidate.Add(Position.board[row + i, column - i]);
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -339,7 +389,7 @@ namespace Othello_Csharp
                                 thisPos = layout[row - i, column + i];
                                 if (thisPos == opponent)
                                 {
-                                    posCandidate.Add(Position.position ( row - i, column + i ));
+                                    posCandidate.Add(Position.board[row - i, column + i]);
                                     continue;
                                 }
                                 else if (thisPos == pieces.blank) break;
@@ -357,7 +407,7 @@ namespace Othello_Csharp
                             }
                             #endregion
                             if (posFlip.Count != 0)
-                                posAble.Add(Position.position ( row, column ), posFlip);
+                                posAble.Add(Position.board[row, column], posFlip);
                         }
                     }
                 }
