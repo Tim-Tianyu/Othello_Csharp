@@ -18,7 +18,7 @@ namespace Othello_Csharp
 
         private pieces[,] layout = new pieces[8,8];
         private pieces player;
-        private byte step = 0;
+        public byte step = 0;
         public Dictionary<Position, List<Position>> posAble;
         private Boolean calculated;
 
@@ -96,7 +96,7 @@ namespace Othello_Csharp
             try
             {
                 b.posAble.TryGetValue(p, out flipPos);
-                b.step++;
+                new_b.step++;
             }
             catch (KeyNotFoundException e)
             {
