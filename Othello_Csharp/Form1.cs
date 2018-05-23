@@ -15,6 +15,8 @@ namespace Othello_Csharp
         Board board = new Board();
         Button[,] projection = new Button[8, 8];//对应的界面上的按钮(棋盘)
         Board.pieces player = Board.pieces.one;
+        Board.pieces AI = Board.pieces.blank;
+
         public Main()
         {
             InitializeComponent();
@@ -126,29 +128,36 @@ namespace Othello_Csharp
 
         private void Button_Click(object sender, EventArgs e)//棋盘被点击
         {
-            disableBoard();
             int i, j;
             Button clicked = (Button)sender;//被点击的按钮
-            clicked.BackColor = getColor(player);
-            List<Position> posFilp = new List<Position>();
+            Position p = null;
             for (i = 0;i < 8;i++)
             {
                 for (j = 0;j < 8; j++)
                 {
                     if (projection[i,j] == clicked)
-                    {   
-                        posFilp = Board.play(Position.board[i, j], board);
+                    {
+                        p = Position.board[i, j];
                         i = 7;
                         break;
                     }
                 }
             }
+            play(p);
+        }
+
+        private void play(Position clicked)
+        {
+            disableBoard();
+            List<Position> posFilp = Board.play(clicked, board);
+            projection[clicked.row, clicked.column].BackColor = getColor(player);
+
             foreach (Position p in posFilp)
             {
                 projection[p.row, p.column].BackColor = getColor(player);
             }
 
-            Board.pieces  nextPlayer = Board.getCurrentPlayer(board);
+            Board.pieces nextPlayer = Board.getCurrentPlayer(board);
             if (player == nextPlayer)
             {
                 MessageBox.Show("skip the turn");
@@ -166,7 +175,19 @@ namespace Othello_Csharp
                 num2.Text = string.Format("{0:D}", score[1]);
                 enableBoard();
             }
+            turnAI();
         }
+
+        private void turnAI()
+        {
+            if (AI == Board.pieces.blank || AI != player) return;
+
+            State.playAs = AI;
+            Position target = State.minmax(new SimpleEval(board));
+            if (target != null)
+                play(target);
+        }
+
         public void finish()//游戏结束
         {
             int one, two;
@@ -188,6 +209,23 @@ namespace Othello_Csharp
             {
                 MessageBox.Show("0");
             }
+        }
+
+        private void RB_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender == RB_p1)
+            {
+                AI = Board.pieces.one;
+            } 
+            else if (sender == RB_p2)
+            {
+                AI = Board.pieces.two;
+            }
+            else
+            {
+                AI = Board.pieces.blank;
+            }
+            turnAI();
         }
     }
 }

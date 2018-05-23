@@ -96,6 +96,10 @@
             this.name2 = new System.Windows.Forms.Label();
             this.num1 = new System.Windows.Forms.Label();
             this.num2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.RB_p1 = new System.Windows.Forms.RadioButton();
+            this.RB_p2 = new System.Windows.Forms.RadioButton();
+            this.RB_off = new System.Windows.Forms.RadioButton();
             this.SuspendLayout();
             // 
             // Pos11
@@ -963,11 +967,60 @@
             this.num2.TabIndex = 67;
             this.num2.Text = "2";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(752, 274);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(35, 18);
+            this.label1.TabIndex = 68;
+            this.label1.Text = "AI:";
+            // 
+            // RB_p1
+            // 
+            this.RB_p1.AutoSize = true;
+            this.RB_p1.Location = new System.Drawing.Point(755, 302);
+            this.RB_p1.Name = "RB_p1";
+            this.RB_p1.Size = new System.Drawing.Size(96, 22);
+            this.RB_p1.TabIndex = 69;
+            this.RB_p1.TabStop = true;
+            this.RB_p1.Text = "Player1";
+            this.RB_p1.UseVisualStyleBackColor = true;
+            this.RB_p1.CheckedChanged += new System.EventHandler(this.RB_CheckedChanged);
+            // 
+            // RB_p2
+            // 
+            this.RB_p2.AutoSize = true;
+            this.RB_p2.Location = new System.Drawing.Point(755, 330);
+            this.RB_p2.Name = "RB_p2";
+            this.RB_p2.Size = new System.Drawing.Size(96, 22);
+            this.RB_p2.TabIndex = 70;
+            this.RB_p2.TabStop = true;
+            this.RB_p2.Text = "Player2";
+            this.RB_p2.UseVisualStyleBackColor = true;
+            this.RB_p2.CheckedChanged += new System.EventHandler(this.RB_CheckedChanged);
+            // 
+            // RB_off
+            // 
+            this.RB_off.AutoSize = true;
+            this.RB_off.Location = new System.Drawing.Point(755, 358);
+            this.RB_off.Name = "RB_off";
+            this.RB_off.Size = new System.Drawing.Size(60, 22);
+            this.RB_off.TabIndex = 71;
+            this.RB_off.TabStop = true;
+            this.RB_off.Text = "Off";
+            this.RB_off.UseVisualStyleBackColor = true;
+            this.RB_off.CheckedChanged += new System.EventHandler(this.RB_CheckedChanged);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1026, 692);
+            this.Controls.Add(this.RB_off);
+            this.Controls.Add(this.RB_p2);
+            this.Controls.Add(this.RB_p1);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.num2);
             this.Controls.Add(this.num1);
             this.Controls.Add(this.name2);
@@ -1114,6 +1167,10 @@
         private System.Windows.Forms.Label name2;
         private System.Windows.Forms.Label num1;
         private System.Windows.Forms.Label num2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.RadioButton RB_p1;
+        private System.Windows.Forms.RadioButton RB_p2;
+        private System.Windows.Forms.RadioButton RB_off;
     }
 }
 

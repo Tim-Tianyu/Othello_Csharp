@@ -10,12 +10,12 @@ namespace Othello_Csharp
     {
         public SimpleEval(Board b) : base(b) { }
 
-        public State next(Position p)
+        public override State next(Position p)
         {
             return new SimpleEval(Board.next(p, board));
         }
 
-        public int eval()
+        public override int eval()
         {
             int[] count = Board.count(board);
             int value = count[0] - count[1];

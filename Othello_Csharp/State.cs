@@ -10,7 +10,8 @@ namespace Othello_Csharp
     {
         protected Board board;
         public static Board.pieces playAs;
-        public static byte limit = 10;
+        public static byte init = 0;
+        public static byte limit = 6;
         public State(Board board) 
         {
             this.board = board;
@@ -29,7 +30,7 @@ namespace Othello_Csharp
 
         public bool isCutOff() 
         {
-            return board.step == limit || Board.getCurrentPlayer(board) == Board.pieces.blank;
+            return board.step == init + limit || Board.getCurrentPlayer(board) == Board.pieces.blank;
         }
 
         abstract public State next(Position p);
@@ -38,6 +39,7 @@ namespace Othello_Csharp
 
         public static Position minmax(State s)
         {
+            State.init = s.board.step;
             if (s.isCutOff()) return null;
             if (s.getPlayer() != State.playAs) return null;
             int max = -64;
