@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Othello_Csharp
@@ -15,7 +16,22 @@ namespace Othello_Csharp
         Board board = new Board();
         Button[,] projection = new Button[8, 8];//对应的界面上的按钮(棋盘)
         Board.pieces player = Board.pieces.one;
-        Board.pieces AI = Board.pieces.blank;
+        Position[] record = new Position[64];
+        private object Locker = new object();
+        private Position target;
+        AI player1 = AI.off;
+        AI player2 = AI.off;
+        //Board.pieces AI = Board.pieces.blank;
+
+        BackgroundWorker workerThread = new BackgroundWorker();
+
+        public enum AI
+        {
+            off = 0,
+            minmax = 1,
+            alphabeta = 2
+        }
+        bool isPaused = false;
 
         public Main()
         {
@@ -88,6 +104,10 @@ namespace Othello_Csharp
             #endregion
             Position.initialPos();
             initialBoard();
+            workerThread.DoWork += workerThread_DoWork;
+            workerThread.ProgressChanged += workerThread_ProgressChanged;
+            workerThread.RunWorkerCompleted += workerThread_RunWorkerCompleted;
+            workerThread.WorkerReportsProgress = true;
         }
         public Color getColor(Board.pieces player){
             if (player == Board.pieces.one)
@@ -114,6 +134,15 @@ namespace Othello_Csharp
             {
                 projection[p.row, p.column].Enabled = false;
                 projection[p.row, p.column].BackColor = SystemColors.ButtonShadow;
+            }
+        }
+
+        public void disableBoard2()// without change color
+        {
+            foreach (Position p in Board.getPosAble(board))
+            {
+                projection[p.row, p.column].Enabled = false;
+                projection[p.row, p.column].BackColor = Color.LightGray;
             }
         }
 
@@ -174,18 +203,22 @@ namespace Othello_Csharp
                 num1.Text = string.Format("{0:D}", score[0]);
                 num2.Text = string.Format("{0:D}", score[1]);
                 enableBoard();
+                turnAI();
             }
-            turnAI();
         }
 
         private void turnAI()
         {
-            if (AI == Board.pieces.blank || AI != player) return;
+            if (player == Board.pieces.one && player1 == AI.off) return;
+            if (player == Board.pieces.two && player2 == AI.off) return;
+            disableBoard2();
+            BT_switch.Enabled = false;
+            State.playAs = player;
 
-            State.playAs = AI;
-            Position target = State.minmax(new SimpleEval(board));
-            if (target != null)
-                play(target);
+            workerThread.RunWorkerAsync();
+            //target = State.minmax(new SimpleEval(board));
+            //if (target != null)
+            //    play(target);
         }
 
         public void finish()//游戏结束
@@ -211,21 +244,71 @@ namespace Othello_Csharp
             }
         }
 
-        private void RB_CheckedChanged(object sender, EventArgs e)
+
+        private void BT_switch_Click(object sender, EventArgs e)
         {
-            if (sender == RB_p1)
-            {
-                AI = Board.pieces.one;
-            } 
-            else if (sender == RB_p2)
-            {
-                AI = Board.pieces.two;
-            }
-            else
-            {
-                AI = Board.pieces.blank;
-            }
+            isPaused = !isPaused;
+            RB_p1_AB.Enabled = isPaused;
+            RB_p1_MM.Enabled = isPaused;
+            RB_p1_Off.Enabled = isPaused;
+            RB_p2_AB.Enabled = isPaused;
+            RB_p2_MM.Enabled = isPaused;
+            RB_p2_Off.Enabled = isPaused;
+            if (isPaused) disableBoard2();
+            else enableBoard();
             turnAI();
+        }
+
+        private void Player1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender == RB_p1_Off && RB_p1_Off.Checked)
+            {
+                player1 = AI.off;
+            }
+            else if (sender == RB_p1_MM && RB_p1_MM.Checked)
+            {
+                player1 = AI.minmax;
+            }
+            else if (sender == RB_p1_AB && RB_p1_AB.Checked)
+            {
+                player1 = AI.off;
+            }
+        }
+
+        private void Player2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (sender == RB_p2_Off && RB_p2_Off.Checked)
+            {
+                player2 = AI.off;
+            }
+            else if (sender == RB_p2_MM && RB_p2_MM.Checked)
+            {
+                player2 = AI.minmax;
+            }
+            else if (sender == RB_p2_AB && RB_p2_AB.Checked)
+            {
+                player2 = AI.off;
+            }
+        }
+
+        private void workerThread_DoWork(object sender, DoWorkEventArgs e)
+        {
+            target = State.minmax(new SimpleEval(board));
+            workerThread.ReportProgress(0);
+            Thread.Sleep(1000);
+            
+        }
+
+        private void workerThread_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            projection[target.row, target.column].BackColor = Color.Red;
+        }
+
+        private void workerThread_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            BT_switch.Enabled = true;
+            if (target != null)
+                play(target);
         }
     }
 }

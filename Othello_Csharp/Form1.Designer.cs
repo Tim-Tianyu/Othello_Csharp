@@ -96,10 +96,19 @@
             this.name2 = new System.Windows.Forms.Label();
             this.num1 = new System.Windows.Forms.Label();
             this.num2 = new System.Windows.Forms.Label();
+            this.GB_player1 = new System.Windows.Forms.GroupBox();
+            this.RB_p1_AB = new System.Windows.Forms.RadioButton();
+            this.RB_p1_MM = new System.Windows.Forms.RadioButton();
+            this.RB_p1_Off = new System.Windows.Forms.RadioButton();
+            this.GB_player2 = new System.Windows.Forms.GroupBox();
+            this.RB_p2_AB = new System.Windows.Forms.RadioButton();
+            this.RB_p2_MM = new System.Windows.Forms.RadioButton();
+            this.RB_p2_Off = new System.Windows.Forms.RadioButton();
+            this.BT_switch = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.RB_p1 = new System.Windows.Forms.RadioButton();
-            this.RB_p2 = new System.Windows.Forms.RadioButton();
-            this.RB_off = new System.Windows.Forms.RadioButton();
+            this.label2 = new System.Windows.Forms.Label();
+            this.GB_player1.SuspendLayout();
+            this.GB_player2.SuspendLayout();
             this.SuspendLayout();
             // 
             // Pos11
@@ -967,60 +976,144 @@
             this.num2.TabIndex = 67;
             this.num2.Text = "2";
             // 
+            // GB_player1
+            // 
+            this.GB_player1.Controls.Add(this.RB_p1_AB);
+            this.GB_player1.Controls.Add(this.RB_p1_MM);
+            this.GB_player1.Controls.Add(this.RB_p1_Off);
+            this.GB_player1.Location = new System.Drawing.Point(716, 325);
+            this.GB_player1.Name = "GB_player1";
+            this.GB_player1.Size = new System.Drawing.Size(130, 219);
+            this.GB_player1.TabIndex = 72;
+            this.GB_player1.TabStop = false;
+            this.GB_player1.Text = "Player1:";
+            // 
+            // RB_p1_AB
+            // 
+            this.RB_p1_AB.AutoSize = true;
+            this.RB_p1_AB.Enabled = false;
+            this.RB_p1_AB.Location = new System.Drawing.Point(7, 96);
+            this.RB_p1_AB.Name = "RB_p1_AB";
+            this.RB_p1_AB.Size = new System.Drawing.Size(114, 22);
+            this.RB_p1_AB.TabIndex = 2;
+            this.RB_p1_AB.Text = "AlphaBeta";
+            this.RB_p1_AB.UseVisualStyleBackColor = true;
+            this.RB_p1_AB.CheckedChanged += new System.EventHandler(this.Player1_CheckedChanged);
+            // 
+            // RB_p1_MM
+            // 
+            this.RB_p1_MM.AutoSize = true;
+            this.RB_p1_MM.Enabled = false;
+            this.RB_p1_MM.Location = new System.Drawing.Point(7, 67);
+            this.RB_p1_MM.Name = "RB_p1_MM";
+            this.RB_p1_MM.Size = new System.Drawing.Size(87, 22);
+            this.RB_p1_MM.TabIndex = 1;
+            this.RB_p1_MM.Text = "MinMax";
+            this.RB_p1_MM.UseVisualStyleBackColor = true;
+            this.RB_p1_MM.CheckedChanged += new System.EventHandler(this.Player1_CheckedChanged);
+            // 
+            // RB_p1_Off
+            // 
+            this.RB_p1_Off.AutoSize = true;
+            this.RB_p1_Off.Checked = true;
+            this.RB_p1_Off.Enabled = false;
+            this.RB_p1_Off.Location = new System.Drawing.Point(7, 38);
+            this.RB_p1_Off.Name = "RB_p1_Off";
+            this.RB_p1_Off.Size = new System.Drawing.Size(60, 22);
+            this.RB_p1_Off.TabIndex = 0;
+            this.RB_p1_Off.TabStop = true;
+            this.RB_p1_Off.Text = "Off";
+            this.RB_p1_Off.UseVisualStyleBackColor = true;
+            this.RB_p1_Off.CheckedChanged += new System.EventHandler(this.Player1_CheckedChanged);
+            // 
+            // GB_player2
+            // 
+            this.GB_player2.Controls.Add(this.RB_p2_AB);
+            this.GB_player2.Controls.Add(this.RB_p2_MM);
+            this.GB_player2.Controls.Add(this.RB_p2_Off);
+            this.GB_player2.Location = new System.Drawing.Point(872, 325);
+            this.GB_player2.Name = "GB_player2";
+            this.GB_player2.Size = new System.Drawing.Size(130, 219);
+            this.GB_player2.TabIndex = 73;
+            this.GB_player2.TabStop = false;
+            this.GB_player2.Text = "Player2:";
+            // 
+            // RB_p2_AB
+            // 
+            this.RB_p2_AB.AutoSize = true;
+            this.RB_p2_AB.Enabled = false;
+            this.RB_p2_AB.Location = new System.Drawing.Point(7, 96);
+            this.RB_p2_AB.Name = "RB_p2_AB";
+            this.RB_p2_AB.Size = new System.Drawing.Size(114, 22);
+            this.RB_p2_AB.TabIndex = 2;
+            this.RB_p2_AB.Text = "AlphaBeta";
+            this.RB_p2_AB.UseVisualStyleBackColor = true;
+            this.RB_p2_AB.CheckedChanged += new System.EventHandler(this.Player2_CheckedChanged);
+            // 
+            // RB_p2_MM
+            // 
+            this.RB_p2_MM.AutoSize = true;
+            this.RB_p2_MM.Enabled = false;
+            this.RB_p2_MM.Location = new System.Drawing.Point(7, 67);
+            this.RB_p2_MM.Name = "RB_p2_MM";
+            this.RB_p2_MM.Size = new System.Drawing.Size(87, 22);
+            this.RB_p2_MM.TabIndex = 1;
+            this.RB_p2_MM.Text = "MinMax";
+            this.RB_p2_MM.UseVisualStyleBackColor = true;
+            this.RB_p2_MM.CheckedChanged += new System.EventHandler(this.Player2_CheckedChanged);
+            // 
+            // RB_p2_Off
+            // 
+            this.RB_p2_Off.AutoSize = true;
+            this.RB_p2_Off.Checked = true;
+            this.RB_p2_Off.Enabled = false;
+            this.RB_p2_Off.Location = new System.Drawing.Point(7, 38);
+            this.RB_p2_Off.Name = "RB_p2_Off";
+            this.RB_p2_Off.Size = new System.Drawing.Size(60, 22);
+            this.RB_p2_Off.TabIndex = 0;
+            this.RB_p2_Off.TabStop = true;
+            this.RB_p2_Off.Text = "Off";
+            this.RB_p2_Off.UseVisualStyleBackColor = true;
+            this.RB_p2_Off.CheckedChanged += new System.EventHandler(this.Player2_CheckedChanged);
+            // 
+            // BT_switch
+            // 
+            this.BT_switch.Location = new System.Drawing.Point(806, 285);
+            this.BT_switch.Name = "BT_switch";
+            this.BT_switch.Size = new System.Drawing.Size(75, 34);
+            this.BT_switch.TabIndex = 74;
+            this.BT_switch.Text = "Pause";
+            this.BT_switch.UseVisualStyleBackColor = true;
+            this.BT_switch.Click += new System.EventHandler(this.BT_switch_Click);
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(752, 274);
+            this.label1.Location = new System.Drawing.Point(57, 27);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 18);
-            this.label1.TabIndex = 68;
-            this.label1.Text = "AI:";
+            this.label1.Size = new System.Drawing.Size(17, 18);
+            this.label1.TabIndex = 75;
+            this.label1.Text = "1";
             // 
-            // RB_p1
+            // label2
             // 
-            this.RB_p1.AutoSize = true;
-            this.RB_p1.Location = new System.Drawing.Point(755, 302);
-            this.RB_p1.Name = "RB_p1";
-            this.RB_p1.Size = new System.Drawing.Size(96, 22);
-            this.RB_p1.TabIndex = 69;
-            this.RB_p1.TabStop = true;
-            this.RB_p1.Text = "Player1";
-            this.RB_p1.UseVisualStyleBackColor = true;
-            this.RB_p1.CheckedChanged += new System.EventHandler(this.RB_CheckedChanged);
-            // 
-            // RB_p2
-            // 
-            this.RB_p2.AutoSize = true;
-            this.RB_p2.Location = new System.Drawing.Point(755, 330);
-            this.RB_p2.Name = "RB_p2";
-            this.RB_p2.Size = new System.Drawing.Size(96, 22);
-            this.RB_p2.TabIndex = 70;
-            this.RB_p2.TabStop = true;
-            this.RB_p2.Text = "Player2";
-            this.RB_p2.UseVisualStyleBackColor = true;
-            this.RB_p2.CheckedChanged += new System.EventHandler(this.RB_CheckedChanged);
-            // 
-            // RB_off
-            // 
-            this.RB_off.AutoSize = true;
-            this.RB_off.Location = new System.Drawing.Point(755, 358);
-            this.RB_off.Name = "RB_off";
-            this.RB_off.Size = new System.Drawing.Size(60, 22);
-            this.RB_off.TabIndex = 71;
-            this.RB_off.TabStop = true;
-            this.RB_off.Text = "Off";
-            this.RB_off.UseVisualStyleBackColor = true;
-            this.RB_off.CheckedChanged += new System.EventHandler(this.RB_CheckedChanged);
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(683, 652);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(17, 18);
+            this.label2.TabIndex = 76;
+            this.label2.Text = "8";
             // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1026, 692);
-            this.Controls.Add(this.RB_off);
-            this.Controls.Add(this.RB_p2);
-            this.Controls.Add(this.RB_p1);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.BT_switch);
+            this.Controls.Add(this.GB_player2);
+            this.Controls.Add(this.GB_player1);
             this.Controls.Add(this.num2);
             this.Controls.Add(this.num1);
             this.Controls.Add(this.name2);
@@ -1092,6 +1185,10 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Main";
             this.Text = "Othello";
+            this.GB_player1.ResumeLayout(false);
+            this.GB_player1.PerformLayout();
+            this.GB_player2.ResumeLayout(false);
+            this.GB_player2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1167,10 +1264,17 @@
         private System.Windows.Forms.Label name2;
         private System.Windows.Forms.Label num1;
         private System.Windows.Forms.Label num2;
+        private System.Windows.Forms.GroupBox GB_player1;
+        private System.Windows.Forms.RadioButton RB_p1_AB;
+        private System.Windows.Forms.RadioButton RB_p1_MM;
+        private System.Windows.Forms.RadioButton RB_p1_Off;
+        private System.Windows.Forms.GroupBox GB_player2;
+        private System.Windows.Forms.RadioButton RB_p2_AB;
+        private System.Windows.Forms.RadioButton RB_p2_MM;
+        private System.Windows.Forms.RadioButton RB_p2_Off;
+        private System.Windows.Forms.Button BT_switch;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.RadioButton RB_p1;
-        private System.Windows.Forms.RadioButton RB_p2;
-        private System.Windows.Forms.RadioButton RB_off;
+        private System.Windows.Forms.Label label2;
     }
 }
 
