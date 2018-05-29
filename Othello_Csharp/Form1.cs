@@ -21,6 +21,7 @@ namespace Othello_Csharp
         private Position target;
         AI player1 = AI.off;
         AI player2 = AI.off;
+        AI current = AI.off;
         //Board.pieces AI = Board.pieces.blank;
 
         BackgroundWorker workerThread = new BackgroundWorker();
@@ -209,8 +210,11 @@ namespace Othello_Csharp
 
         private void turnAI()
         {
-            if (player == Board.pieces.one && player1 == AI.off) return;
-            if (player == Board.pieces.two && player2 == AI.off) return;
+            if (player == Board.pieces.blank) return;
+            else if (player == Board.pieces.one) current = player1;
+            else if (player == Board.pieces.two) current = player2;
+            if (current == AI.off) return;
+
             disableBoard2();
             BT_switch.Enabled = false;
             State.playAs = player;
@@ -223,6 +227,7 @@ namespace Othello_Csharp
 
         public void finish()//游戏结束
         {
+            player = Board.pieces.blank;
             int one, two;
             int[] temp = Board.count(board);
             one = temp[0];
@@ -271,7 +276,7 @@ namespace Othello_Csharp
             }
             else if (sender == RB_p1_AB && RB_p1_AB.Checked)
             {
-                player1 = AI.off;
+                player1 = AI.alphabeta;
             }
         }
 
@@ -287,13 +292,15 @@ namespace Othello_Csharp
             }
             else if (sender == RB_p2_AB && RB_p2_AB.Checked)
             {
-                player2 = AI.off;
+                player2 = AI.alphabeta;
             }
         }
 
         private void workerThread_DoWork(object sender, DoWorkEventArgs e)
         {
-            target = State.minmax(new SimpleEval(board));
+            if (current == AI.minmax) target = State.minmax(new SimpleEval(board));
+            else if (current == AI.alphabeta) target = State.alphabeta(new SimpleEval(board));
+            else throw new Exception("??");
             workerThread.ReportProgress(0);
             Thread.Sleep(1000);
             
